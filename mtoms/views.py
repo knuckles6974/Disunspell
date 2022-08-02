@@ -15,7 +15,7 @@ class ActorView(View):
 
             first_name = data['first_name'],
             last_name  = data['last_name'],
-            birth = data['birth'],
+            date_of_birth=data["date_of_birth"],
 
         )
 
@@ -28,7 +28,7 @@ class MovieView(View):
         input_data = json.loads(request.body)
         
         Movie.objects.create(
-            name = input_data['name'],
+            title = input_data['title'],
             release_date = input_data['release_date'],
             running_time = input_data['running_time'],
             
@@ -38,28 +38,22 @@ class MovieView(View):
                 
             
 class MovieInfoView(View):
-    def get(self,request): 
+    def get(self, request):
         actors = Actor.objects.all()
-        movie_info = Movie.objects.all()
-        result = []
+        results = []
         for actor in actors:
-            movies = actor.movie.all()
+            actormovies = actor.actormovies.all()	
             movie_list = []
-        
-            for movie in movies: 
-                    movie_info = {
-                    "name" : [movie.name for actor.movies in actors],
-                    "release_date" : actor.movie.release_date,
-                    "running_time" : actor.movie.running_time
-                    }
-            movie_list.append(movie_info)
-                
-            result.append(
+            for actormovie in actormovies:
+                movie_info = {
+                    "title": actormovie.movie.title,
+                }
+                movie_list.append(movie_info)
+            results.append(
                 {
-                
-                    "first_name" : actor.first_name,
-                    "last_name"  : actor.last_name
-                
+                    "first_name": actor.first_name,
+                    "last_name": actor.last_name,
+                    "title": movie_list,
                 }
             )
-        return JsonResponse({"영화정보" : result}, status=200)
+        return JsonResponse({"results": results}, status=200)
